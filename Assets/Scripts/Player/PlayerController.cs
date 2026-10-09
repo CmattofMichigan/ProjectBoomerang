@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         inputActions = new PlayerInput();
+        //inputActions.Player.Jump.started += context => {}
     }
 
     private void OnEnable()
@@ -52,6 +53,7 @@ public class PlayerController : MonoBehaviour
         ApplyHorizontalMovement();
     }
 
+    // takes movement input and applies it to the player's velocity
     private void ApplyHorizontalMovement()
     {
         Vector2 input = Vector2.ClampMagnitude(moveInput, 1f);
@@ -63,7 +65,7 @@ public class PlayerController : MonoBehaviour
         characterController.Move(velocity * Time.deltaTime);
     }
 
-   
+    // retrieves the movement input from the player input system
     private void GetMovementInput()
     {
         moveInput = inputActions.Player.Move.ReadValue<Vector2>();
@@ -82,11 +84,14 @@ public class PlayerController : MonoBehaviour
         
         return hit;
     }*/
-
+    
+    // checks if the player is on the ground
     private bool CheckGround()
     {
         return characterController.isGrounded;
     }
+
+
 
     /*private void ApplyGravity()
     {
@@ -110,5 +115,7 @@ public class PlayerController : MonoBehaviour
             
         }
     }*/
+
+
 
 }
