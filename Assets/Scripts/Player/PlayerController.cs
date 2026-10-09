@@ -13,34 +13,64 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = -20f;
     [SerializeField] private float maxFallSpeed = -60f;
 
-    private CapsuleCollider capsuleCollider;
+
+
+    private CharacterController characterController;
+    private Vector2 moveInput;
+    private PlayerInput inputActions;
 
     private Vector3 velocity;
+
+    void Awake()
+    {
+        inputActions = new PlayerInput();
+    }
+
+    private void OnEnable()
+    {
+        inputActions.Player.Enable();
+    }
+
+    private void OnDisable()
+    {
+        inputActions.Player.Disable();
+    }
     
-    private float groundCheckDistance = 0.1f;
-    private bool isGrounded;
+
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        capsuleCollider = GetComponent<CapsuleCollider>();
-
+        characterController = GetComponent<CharacterController>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        isGrounded = CheckGround();
-        ApplyGravity();
-        ApplyMovement();
+        
+        GetMovementInput();
+        ApplyHorizontalMovement();
     }
 
-    private void ApplyMovement()
+    private void ApplyHorizontalMovement()
     {
-        transform.position += velocity * Time.deltaTime;
+        Vector2 input = Vector2.ClampMagnitude(moveInput, 1f);
+
+        velocity.x = input.x * moveSpeed;
+        velocity.z = input.y * moveSpeed;
+        Debug.Log(velocity);
+
+        characterController.Move(velocity * Time.deltaTime);
     }
 
-    private bool CheckCollision(Vector3 direction, float distance, out RaycastHit hitInfo)
+   
+    private void GetMovementInput()
+    {
+        moveInput = inputActions.Player.Move.ReadValue<Vector2>();
+        Debug.Log(moveInput);
+    }
+
+    /*private bool CheckCollision(Vector3 direction, float distance, out RaycastHit hitInfo)
     {
     
         Vector3 center = capsuleCollider.bounds.center;
@@ -48,28 +78,22 @@ public class PlayerController : MonoBehaviour
         Vector3 point1 = center + Vector3.up * (halfHeight - capsuleCollider.radius);
         Vector3 point2 = center + Vector3.down * (halfHeight - capsuleCollider.radius);
 
-        return Physics.CapsuleCast(point1, point2, capsuleCollider.radius, direction, out hitInfo, distance);
-    }
+        bool hit = Physics.CapsuleCast(point1, point2, capsuleCollider.radius, direction, out hitInfo, distance);
+        
+        return hit;
+    }*/
 
     private bool CheckGround()
     {
-        RaycastHit hitInfo;
-
-        if (!CheckCollision(Vector3.down, groundCheckDistance, out hitInfo))
-        {
-            return false;
-        }
-        return hitInfo.normal == Vector3.up;
-        
+        return characterController.isGrounded;
     }
 
-    private void ApplyGravity()
+    /*private void ApplyGravity()
     {
 
-        if (isGrounded)
+        if (CheckGround())
         {
             velocity.y = 0;
-            Debug.Log("Grounded, velocity.y set to 0");
         } 
 
         else
@@ -85,8 +109,6 @@ public class PlayerController : MonoBehaviour
             }
             
         }
-    }
-
-
+    }*/
 
 }
