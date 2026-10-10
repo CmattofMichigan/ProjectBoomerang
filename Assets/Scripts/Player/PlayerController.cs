@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 10f;
+    bool isJumpPressed = false;
 
     [Header("Gravity")]
     [SerializeField] private float gravity = -20f;
@@ -24,7 +25,10 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         inputActions = new PlayerInput();
-        //inputActions.Player.Jump.started += context => {}
+        characterController = GetComponent<CharacterController>();
+
+        inputActions.Player.Jump.started += onJump;
+        inputActions.Player.Jump.canceled += onJump;
     }
 
     private void OnEnable()
@@ -42,34 +46,54 @@ public class PlayerController : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        characterController = GetComponent<CharacterController>();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        
         GetMovementInput();
-        ApplyHorizontalMovement();
+        UpdateVelocity();
+        
     }
 
     // takes movement input and applies it to the player's velocity
+    private void UpdateVelocity()
+    {
+        ApplyGravity();
+        //if on ground
+        if (CheckGround())
+        {
+            // apply horizontal movement when on the ground
+            ApplyHorizontalMovement();
+            // apply jump when on the ground
+            Jump();
+        }
+        // else in air
+        {
+            HandleJumpHeight();
+        }
+        
+        characterController.Move(velocity * Time.deltaTime);
+    }
+
     private void ApplyHorizontalMovement()
     {
         Vector2 input = Vector2.ClampMagnitude(moveInput, 1f);
 
         velocity.x = input.x * moveSpeed;
         velocity.z = input.y * moveSpeed;
-        Debug.Log(velocity);
-
-        characterController.Move(velocity * Time.deltaTime);
     }
 
     // retrieves the movement input from the player input system
     private void GetMovementInput()
     {
         moveInput = inputActions.Player.Move.ReadValue<Vector2>();
-        Debug.Log(moveInput);
+    }
+
+    void onJump(InputAction.CallbackContext context)
+    {
+        isJumpPressed = context.ReadValueAsButton();
     }
 
     /*private bool CheckCollision(Vector3 direction, float distance, out RaycastHit hitInfo)
@@ -93,29 +117,44 @@ public class PlayerController : MonoBehaviour
 
 
 
-    /*private void ApplyGravity()
-    {
 
+
+    private void ApplyGravity()
+    {
         if (CheckGround())
         {
-            velocity.y = 0;
-        } 
+            float groundVelocity = -2f;
+            velocity.y = groundVelocity;
+        }
 
         else
         {
-
-            if (velocity.y > maxFallSpeed)
+            velocity.y += gravity * Time.deltaTime;
+            if (velocity.y < maxFallSpeed)
             {
-                velocity.y += gravity * Time.deltaTime;
-                if (velocity.y < maxFallSpeed)
-                {
-                    velocity.y = maxFallSpeed;
-                }
+                velocity.y = maxFallSpeed;
             }
-            
         }
-    }*/
 
+    }
 
+    private void Jump()
+    {
+        if (isJumpPressed)
+        {
+            velocity.y = jumpForce;
+        }
+    }
+
+    private void HandleJumpHeight()
+    {
+        if (!isJumpPressed)
+        {
+            if (velocity.y > 0)
+            {
+                velocity.y *= 0.5f;
+            }
+        }
+    }
 
 }
