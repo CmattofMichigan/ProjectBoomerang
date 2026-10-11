@@ -14,10 +14,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = -20f;
     [SerializeField] private float maxFallSpeed = -60f;
 
-
-
+    [Header("Components")]
     private CharacterController characterController;
-    private Vector2 moveInput;
+    [SerializeField] private Transform cameraTransform;
+
+    [Header("Player Input")]
+    public Vector2 moveInput { get; set; }
+    public Vector3 targetDirection { get; set; }
     private PlayerInput inputActions;
 
     private Vector3 velocity;
@@ -54,6 +57,8 @@ public class PlayerController : MonoBehaviour
     {
         GetMovementInput();
         UpdateVelocity();
+        Debug.Log(targetDirection);
+        
         
     }
 
@@ -81,8 +86,23 @@ public class PlayerController : MonoBehaviour
     {
         Vector2 input = Vector2.ClampMagnitude(moveInput, 1f);
 
-        velocity.x = input.x * moveSpeed;
-        velocity.z = input.y * moveSpeed;
+        Vector3 cameraForward = cameraTransform.forward;
+        Vector3 cameraRight = cameraTransform.right;
+
+        cameraForward.y = 0;
+        cameraRight.y = 0;
+
+        cameraForward = cameraForward.normalized;
+        cameraRight = cameraRight.normalized;
+
+        targetDirection = cameraForward * input.y + cameraRight * input.x;
+
+        targetDirection = Vector3.ClampMagnitude(targetDirection, 1f);
+        
+
+        velocity.x = targetDirection.x * moveSpeed;
+        velocity.z = targetDirection.z * moveSpeed;
+
     }
 
     // retrieves the movement input from the player input system
