@@ -391,10 +391,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec8e36aebe774c740ad4426b83d44fdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  moveSpeed: 10
+  groundAcceleration: 20
   jumpForce: 10
-  gravity: -20
-  maxFallSpeed: -45
+  gravity: -40
+  maxFallSpeed: -80
   cameraTransform: {fileID: 639211995}
 --- !u!143 &364811410
 CharacterController:
@@ -433,7 +434,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6468c64be15ded4e9664a979a2f98b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cameraTransform: {fileID: 639211995}
   rotationSpeed: 10
 --- !u!1 &410087039
 GameObject:

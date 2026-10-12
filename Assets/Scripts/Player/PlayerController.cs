@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float groundAcceleration = 2f;
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 10f;
@@ -20,10 +21,11 @@ public class PlayerController : MonoBehaviour
 
     [Header("Player Input")]
     public Vector2 moveInput { get; set; }
-    public Vector3 targetDirection { get; set; }
     private PlayerInput inputActions;
 
     private Vector3 velocity;
+    public Vector3 targetDirection { get; set; }
+
 
     void Awake()
     {
@@ -57,9 +59,7 @@ public class PlayerController : MonoBehaviour
     {
         GetMovementInput();
         UpdateVelocity();
-        Debug.Log(targetDirection);
-        
-        
+
     }
 
     // takes movement input and applies it to the player's velocity
@@ -98,10 +98,8 @@ public class PlayerController : MonoBehaviour
         targetDirection = cameraForward * input.y + cameraRight * input.x;
 
         targetDirection = Vector3.ClampMagnitude(targetDirection, 1f);
-        
 
-        velocity.x = targetDirection.x * moveSpeed;
-        velocity.z = targetDirection.z * moveSpeed;
+        ApplyGroundAcceleration();
 
     }
 
@@ -114,6 +112,15 @@ public class PlayerController : MonoBehaviour
     void onJump(InputAction.CallbackContext context)
     {
         isJumpPressed = context.ReadValueAsButton();
+    }
+
+    private void ApplyGroundAcceleration()
+    {
+        Vector3 horizontalMovement = new Vector3(velocity.x, 0, velocity.z);
+
+        horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, groundAcceleration * Time.deltaTime);
+        velocity.x = horizontalMovement.x;
+        velocity.z = horizontalMovement.z;
     }
 
     /*private bool CheckCollision(Vector3 direction, float distance, out RaycastHit hitInfo)
@@ -134,10 +141,6 @@ public class PlayerController : MonoBehaviour
     {
         return characterController.isGrounded;
     }
-
-
-
-
 
     private void ApplyGravity()
     {
