@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float groundAcceleration = 2f;
+    [SerializeField] private float groundAcceleration = 10f;
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 10f;
@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     [Header("Gravity")]
     [SerializeField] private float gravity = -20f;
     [SerializeField] private float maxFallSpeed = -60f;
+    [SerializeField] private float airAcceleration = 5f;
 
     [Header("Components")]
     private CharacterController characterController;
@@ -66,17 +67,19 @@ public class PlayerController : MonoBehaviour
     private void UpdateVelocity()
     {
         ApplyGravity();
+        ApplyHorizontalMovement();
         //if on ground
         if (CheckGround())
         {
-            // apply horizontal movement when on the ground
-            ApplyHorizontalMovement();
             // apply jump when on the ground
+            ApplyGroundAcceleration();
             Jump();
         }
         // else in air
+        else
         {
             HandleJumpHeight();
+            ApplyAirAcceleration();
         }
         
         characterController.Move(velocity * Time.deltaTime);
@@ -99,8 +102,6 @@ public class PlayerController : MonoBehaviour
 
         targetDirection = Vector3.ClampMagnitude(targetDirection, 1f);
 
-        ApplyGroundAcceleration();
-
     }
 
     // retrieves the movement input from the player input system
@@ -119,6 +120,15 @@ public class PlayerController : MonoBehaviour
         Vector3 horizontalMovement = new Vector3(velocity.x, 0, velocity.z);
 
         horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, groundAcceleration * Time.deltaTime);
+        velocity.x = horizontalMovement.x;
+        velocity.z = horizontalMovement.z;
+    }
+
+    private void ApplyAirAcceleration()
+    {
+        Vector3 horizontalMovement = new Vector3(velocity.x, 0, velocity.z);
+
+        horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, airAcceleration * Time.deltaTime);
         velocity.x = horizontalMovement.x;
         velocity.z = horizontalMovement.z;
     }
