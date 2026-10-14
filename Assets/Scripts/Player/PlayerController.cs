@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,12 +10,19 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private float jumpVelocityCut = 0.5f;
+    [SerializeField] private float jumpApexThreshold = 1.5f;
     bool isJumpPressed = false;
+    bool isJumping = false;
+    bool jumpRequested = false;
+
 
     [Header("Gravity")]
     [SerializeField] private float gravity = -20f;
     [SerializeField] private float maxFallSpeed = -60f;
     [SerializeField] private float airAcceleration = 5f;
+    [SerializeField] private float apexGravityMultiplier = 0.3f;
+    
 
     [Header("Components")]
     private CharacterController characterController;
@@ -68,17 +76,18 @@ public class PlayerController : MonoBehaviour
     {
         ApplyGravity();
         ApplyHorizontalMovement();
+        Jump();
         //if on ground
         if (CheckGround())
         {
             // apply jump when on the ground
             ApplyGroundAcceleration();
-            Jump();
+            
         }
         // else in air
         else
         {
-            HandleJumpHeight();
+            
             ApplyAirAcceleration();
         }
         
@@ -113,6 +122,11 @@ public class PlayerController : MonoBehaviour
     void onJump(InputAction.CallbackContext context)
     {
         isJumpPressed = context.ReadValueAsButton();
+
+        if (context.started)
+        {
+            jumpRequested = true;
+        }
     }
 
     private void ApplyGroundAcceleration()
@@ -163,6 +177,11 @@ public class PlayerController : MonoBehaviour
         else
         {
             velocity.y += gravity * Time.deltaTime;
+            //if near apex of jump reduce gravity for short hangtime
+            if (Mathf.Abs(velocity.y) < jumpApexThreshold)
+            {
+                velocity.y *= apexGravityMultiplier;
+            }
             if (velocity.y < maxFallSpeed)
             {
                 velocity.y = maxFallSpeed;
@@ -173,21 +192,28 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if (isJumpPressed)
-        {
-            velocity.y = jumpForce;
-        }
-    }
 
-    private void HandleJumpHeight()
-    {
-        if (!isJumpPressed)
+        if (jumpRequested && CheckGround())
+        {
+            jumpRequested = false;
+            velocity.y = jumpForce;
+            isJumping = true;
+        }
+
+        if (velocity.y <= 0)
+        {
+            isJumping = false;
+        }
+
+
+        if (!isJumpPressed && isJumping)
         {
             if (velocity.y > 0)
             {
-                velocity.y *= 0.5f;
+                velocity.y *= jumpVelocityCut;
             }
         }
+
     }
 
 }
