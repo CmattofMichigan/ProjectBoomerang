@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,7 +9,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 10f;
-    [SerializeField] private float jumpVelocityCut = 0.5f;
+    [SerializeField] private float jumpCutGravityMultiplier = 0.5f;
     [SerializeField] private float jumpApexThreshold = 1.5f;
     bool isJumpPressed = false;
     bool isJumping = false;
@@ -206,11 +205,12 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        if (!isJumpPressed && isJumping)
+        if (!isJumpPressed && isJumping && velocity.y > 0)
         {
             if (velocity.y > 0)
             {
-                velocity.y *= jumpVelocityCut;
+                velocity.y /= jumpCutGravityMultiplier;
+                Debug.Log("Jump cut");
             }
         }
 
