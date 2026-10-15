@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpApexThreshold = 1.5f;
     bool isJumpPressed = false;
     bool isJumping = false;
-    bool jumpRequested = false;
+    public bool jumpRequested = false;
 
 
     [Header("Gravity")]
@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour
     public Vector2 moveInput { get; set; }
     private PlayerInput inputActions;
 
-    private Vector3 velocity;
+    public Vector3 velocity;
     public Vector3 targetDirection { get; set; }
 
 
@@ -210,7 +210,6 @@ public class PlayerController : MonoBehaviour
             if (velocity.y > 0)
             {
                 velocity.y /= jumpCutGravityMultiplier;
-                Debug.Log("Jump cut");
             }
         }
 

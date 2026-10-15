@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 9070373041747561653}
   - component: {fileID: 4160243043646671132}
   - component: {fileID: 7333623701501295311}
+  - component: {fileID: 1261465421062543839}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -108,11 +109,13 @@ MonoBehaviour:
   jumpForce: 15
   jumpCutGravityMultiplier: 1.2
   jumpApexThreshold: 0.1
+  jumpRequested: 0
   gravity: -30
   maxFallSpeed: -80
   airAcceleration: 20
   apexGravityMultiplier: 0.15
   cameraTransform: {fileID: 9109091393968607381}
+  velocity: {x: 0, y: 0, z: 0}
 --- !u!143 &4160243043646671132
 CharacterController:
   m_ObjectHideFlags: 0
@@ -151,6 +154,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotationSpeed: 10
+--- !u!114 &1261465421062543839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1222990303323863618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3da951fd0f2f166439e7d10bb632a185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  kickForce: 5
+  kickLift: 3
 --- !u!1 &7206329406951060127
 GameObject:
   m_ObjectHideFlags: 0
@@ -292,8 +309,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7871565339347727909}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.13543242, y: 0.83389974, z: -0.4806981, w: 0.23494387}
-  m_LocalPosition: {x: -1.3878508, y: 4.5902557, z: 2.267482}
+  m_LocalRotation: {x: 0.07916873, y: 0.323618, z: -0.027184106, w: 0.942478}
+  m_LocalPosition: {x: -1.9332963, y: 0.5324745, z: -2.4832683}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -376,7 +393,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: 148.53058
+    Value: 37.90191
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -386,7 +403,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: 37.66447
+    Value: -1.784536
     Center: 28.05
     Range: {x: -10, y: 45}
     Wrap: 0
