@@ -115,6 +115,8 @@ MonoBehaviour:
   cameraTransform: {fileID: 9109091393968607381}
   jump: {fileID: 8300000, guid: 64c318239dc05dc44a2b4c3c8415cc62, type: 3}
   land: {fileID: 8300000, guid: a7fffb479aa554c4897f64205c1a6a7a, type: 3}
+  Boomerang: {fileID: -5466233882258318452, guid: 0a84f01990d8403039ffe8e55ef6800c, type: 3}
+  pickupCooldown: 1
 --- !u!143 &4160243043646671132
 CharacterController:
   m_ObjectHideFlags: 0
