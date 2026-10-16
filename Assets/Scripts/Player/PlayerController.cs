@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxFallSpeed = -60f;
     [SerializeField] private float airAcceleration = 5f;
     [SerializeField] private float apexGravityMultiplier = 0.3f;
+    private bool wasGrounded;
     
 
     [Header("Components")]
@@ -30,6 +31,10 @@ public class PlayerController : MonoBehaviour
     [Header("Player Input")]
     public Vector2 moveInput { get; set; }
     private PlayerInput inputActions;
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip jump;
+    [SerializeField] private AudioClip land;
 
     private Vector3 velocity;
     public Vector3 targetDirection { get; set; }
@@ -91,6 +96,8 @@ public class PlayerController : MonoBehaviour
         }
         
         characterController.Move(velocity * Time.deltaTime);
+
+        CheckLanding();
     }
 
     private void ApplyHorizontalMovement()
@@ -197,6 +204,8 @@ public class PlayerController : MonoBehaviour
             jumpRequested = false;
             velocity.y = jumpForce;
             isJumping = true;
+            //play jump sound
+            SFXManager.instance.PlaySFXClip(jump, transform, 1f);
         }
 
         if (velocity.y <= 0)
@@ -214,6 +223,19 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+    }
+
+    private void CheckLanding()
+    {
+        bool isGrounded = CheckGround(); 
+
+        if (isGrounded && !wasGrounded)
+        {
+            // Player has just landed
+            SFXManager.instance.PlaySFXClip(land, transform, 1f);
+        }
+
+        wasGrounded = isGrounded;
     }
 
 }
