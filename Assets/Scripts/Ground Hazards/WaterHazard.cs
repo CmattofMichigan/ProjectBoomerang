@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LavaHazard : MonoBehaviour
+public class WaterHazard : MonoBehaviour
 {
     public Transform respawnPoint;
 
