@@ -116,6 +116,10 @@ MonoBehaviour:
   apexGravityMultiplier: 0.15
   cameraTransform: {fileID: 9109091393968607381}
   velocity: {x: 0, y: 0, z: 0}
+  jump: {fileID: 8300000, guid: 64c318239dc05dc44a2b4c3c8415cc62, type: 3}
+  land: {fileID: 8300000, guid: a7fffb479aa554c4897f64205c1a6a7a, type: 3}
+  Boomerang: {fileID: -5466233882258318452, guid: 0a84f01990d8403039ffe8e55ef6800c, type: 3}
+  pickupCooldown: 1
 --- !u!143 &4160243043646671132
 CharacterController:
   m_ObjectHideFlags: 0
@@ -309,8 +313,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7871565339347727909}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07916873, y: 0.323618, z: -0.027184106, w: 0.942478}
-  m_LocalPosition: {x: -1.9332963, y: 0.5324745, z: -2.4832683}
+  m_LocalRotation: {x: 0.10487655, y: 0.88763374, z: -0.3722443, w: 0.25008294}
+  m_LocalPosition: {x: -1.8273025, y: 3.56231, z: 2.985462}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -403,7 +407,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: -1.784536
+    Value: 28.05
     Center: 28.05
     Range: {x: -10, y: 45}
     Wrap: 0

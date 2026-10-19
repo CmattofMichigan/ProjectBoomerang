@@ -21,6 +21,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxFallSpeed = -60f;
     [SerializeField] private float airAcceleration = 5f;
     [SerializeField] private float apexGravityMultiplier = 0.3f;
+    private bool wasGrounded;
     
 
     [Header("Components")]
@@ -30,6 +31,14 @@ public class PlayerController : MonoBehaviour
     [Header("Player Input")]
     public Vector2 moveInput { get; set; }
     private PlayerInput inputActions;
+
+    [Header("Audio")]
+    [SerializeField] private AudioClip jump;
+    [SerializeField] private AudioClip land;
+
+    [Header("Throw")]
+    [SerializeField] public Rigidbody Boomerang;
+    private bool isThrown = false;
 
     public Vector3 velocity;
     public Vector3 targetDirection { get; set; }
@@ -42,6 +51,8 @@ public class PlayerController : MonoBehaviour
 
         inputActions.Player.Jump.started += onJump;
         inputActions.Player.Jump.canceled += onJump;
+
+        inputActions.Player.BoomerangThrow.started += OnBoomerangThrow;
     }
 
     private void OnEnable()
@@ -67,7 +78,6 @@ public class PlayerController : MonoBehaviour
     {
         GetMovementInput();
         UpdateVelocity();
-
     }
 
     // takes movement input and applies it to the player's velocity
@@ -91,6 +101,8 @@ public class PlayerController : MonoBehaviour
         }
         
         characterController.Move(velocity * Time.deltaTime);
+
+        CheckLanding();
     }
 
     private void ApplyHorizontalMovement()
@@ -125,6 +137,15 @@ public class PlayerController : MonoBehaviour
         if (context.started)
         {
             jumpRequested = true;
+        }
+    }
+
+    void OnBoomerangThrow(InputAction.CallbackContext context)
+    {
+        if (context.ReadValueAsButton() && !isThrown)
+        {
+            Rigidbody boom = Instantiate(Boomerang, transform.position + transform.forward, transform.rotation) as Rigidbody;
+            isThrown = true;
         }
     }
 
@@ -197,6 +218,8 @@ public class PlayerController : MonoBehaviour
             jumpRequested = false;
             velocity.y = jumpForce;
             isJumping = true;
+            //play jump sound
+            SFXManager.instance.PlaySFXClip(jump, transform, 1f);
         }
 
         if (velocity.y <= 0)
@@ -213,6 +236,29 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+    }
+
+    private void CheckLanding()
+    {
+        bool isGrounded = CheckGround(); 
+
+        if (isGrounded && !wasGrounded)
+        {
+            // Player has just landed
+            SFXManager.instance.PlaySFXClip(land, transform, 1f);
+        }
+
+        wasGrounded = isGrounded;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        GameObject otherThing = collision.gameObject;
+        if (otherThing.CompareTag("Boomerang"))
+        {
+            Destroy(otherThing);
+            isThrown = false;
+        }
     }
 
 }
