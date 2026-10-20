@@ -12,9 +12,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpCutGravityMultiplier = 0.5f;
     [SerializeField] private float jumpApexThreshold = 1.5f;
     bool isJumpPressed = false;
-    bool isJumping = false;
+    public bool isJumping = false;
     public bool jumpRequested = false;
 
+    [Header("Wall Kick")]
+    public bool isWallKickVelocityLocked = false;
 
     [Header("Gravity")]
     [SerializeField] private float gravity = -20f;
@@ -87,19 +89,22 @@ public class PlayerController : MonoBehaviour
         ApplyHorizontalMovement();
         Jump();
         //if on ground
+
         if (CheckGround())
         {
             // apply jump when on the ground
             ApplyGroundAcceleration();
-            
+
         }
         // else in air
         else
         {
-            
+
             ApplyAirAcceleration();
         }
-        
+
+
+
         characterController.Move(velocity * Time.deltaTime);
 
         CheckLanding();
@@ -160,6 +165,11 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyAirAcceleration()
     {
+        if (isWallKickVelocityLocked)
+        {
+            return;
+        }
+
         Vector3 horizontalMovement = new Vector3(velocity.x, 0, velocity.z);
 
         horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, airAcceleration * Time.deltaTime);

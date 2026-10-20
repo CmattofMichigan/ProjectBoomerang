@@ -1,20 +1,36 @@
+using System;
 using UnityEngine;
 
 public class AirKick : MonoBehaviour
 {
+    [Header("Air Kick Settings")]
     [SerializeField] private float kickForce = 10f;
     [SerializeField] private float kickLift = 1f;
     [SerializeField] private float kickDistance = 2f;
     [SerializeField] private float kickDuration = 0.5f;
+    [SerializeField] private float kickDelayTimer = 0.15f;
+    [SerializeField] private float kickInputBufferTimer = 0.2f;
+    private float kickDelayRemaining = 0f;
+    private bool kickInputBuffered = false;
+
+    [Header("Wall Jump Settings")]
     [SerializeField] private float wallJumpForce = 10f;
     [SerializeField] private float wallJumpYForce = 5f;
-    private float kickTimer = 0f;
+    [SerializeField] private float wallJumpControlBuffer = 0.2f;
+    private float wallKickVelocityLockTimer = 0f;
+    [SerializeField] private float wallKickVelocityTimerLength = 2f;
+
+
+    private float kickActiveTimer = 0f;
     private bool kickIsActive = false;
-    private bool kickAvailable = true;
+    private bool kickAvailable = false;
 
 
     private PlayerController playerController;
     private CharacterController characterController;
+    private PlayerRotation playerRotation;
+
+    
 
 
     void Awake()
@@ -33,21 +49,43 @@ public class AirKick : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+        Debug.Log(kickAvailable);
+        checkAirKickAvailability();
+        KickReset();
         airKick();
         castKick();
         KickTimer();
-        KickReset();
+        WallKickControlLock();
+        
+    }
+
+    private void checkAirKickAvailability()
+    {
+        if (!characterController.isGrounded && !kickAvailable && !kickIsActive)
+        {
+            Debug.Log("checking kick availability");
+            kickDelayRemaining += Time.deltaTime;
+
+            if (kickDelayRemaining >= kickDelayTimer)
+            {
+                
+                kickAvailable = true;
+                kickDelayRemaining = 0f;
+            }
+        }
     }
 
     private void airKick()
     {
         
         //if jump pressed while airborne
-        if (playerController.jumpRequested && !characterController.isGrounded && kickAvailable)
+        if (playerController.jumpRequested && kickAvailable)
         {
-            kickAvailable = false;
             kickIsActive = true;
-            kickTimer = 0f;
+            kickAvailable = false;
+            
+            kickActiveTimer = 0f;
             playerController.jumpRequested = false;
             Vector3 kickDirection = playerController.targetDirection * kickForce;
 
@@ -78,9 +116,9 @@ public class AirKick : MonoBehaviour
     {
         if (kickIsActive)
         {
-            kickTimer += Time.deltaTime;
+            kickActiveTimer += Time.deltaTime;
             
-            if (kickTimer >= kickDuration)
+            if (kickActiveTimer >= kickDuration)
             {
                 kickIsActive = false;
             }
@@ -116,6 +154,10 @@ public class AirKick : MonoBehaviour
         playerController.velocity.y = wallJumpYForce;// Apply a vertical force to the player
 
         transform.rotation = Quaternion.LookRotation(wallBounceDirection);
+        //playerRotation.StartWallKickRotationLock();
+        playerController.isWallKickVelocityLocked = true;
+        wallKickVelocityLockTimer = wallKickVelocityTimerLength;
+        
 
         kickAvailable = true;
 
@@ -123,9 +165,28 @@ public class AirKick : MonoBehaviour
 
     private void KickReset()
     {
-        if (characterController.isGrounded)
+        if (characterController.isGrounded || kickIsActive)
         {
-            kickAvailable = true;
+            kickAvailable = false;
         }
     }
+
+    private void WallKickControlLock()
+    {
+        if (wallKickVelocityLockTimer > 0f)
+        {
+            wallKickVelocityLockTimer -= Time.deltaTime;
+        }
+        else
+        {
+            playerController.isWallKickVelocityLocked = false;
+            
+        }
+        
+    }
+
+    
+
+    
+   
 }

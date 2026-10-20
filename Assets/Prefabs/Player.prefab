@@ -109,6 +109,7 @@ MonoBehaviour:
   jumpForce: 15
   jumpCutGravityMultiplier: 1.2
   jumpApexThreshold: 0.1
+  isJumping: 0
   jumpRequested: 0
   gravity: -25
   maxFallSpeed: -80
@@ -156,6 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6468c64be15ded4e9664a979a2f98b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wallKickRotationLock: 2
   rotationSpeed: 10
 --- !u!114 &1261465421062543839
 MonoBehaviour:
@@ -173,8 +175,11 @@ MonoBehaviour:
   kickLift: 3
   kickDistance: 2
   kickDuration: 1
+  kickDelayTimer: 0.15
+  kickInputBufferTimer: 0.2
   wallJumpForce: 8
   wallJumpYForce: 10
+  wallJumpControlBuffer: 0.2
 --- !u!1 &7206329406951060127
 GameObject:
   m_ObjectHideFlags: 0
@@ -316,8 +321,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7871565339347727909}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2641615, y: -0.10026917, z: 0.02762385, w: 0.9588544}
-  m_LocalPosition: {x: 0.8241077, y: 2.3745327, z: -3.8968444}
+  m_LocalRotation: {x: 0.17856237, y: 0.6867053, z: -0.17998137, w: 0.68129146}
+  m_LocalPosition: {x: -3.9998176, y: 2.2506206, z: 0.030826557}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -400,7 +405,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: -11.941013
+    Value: 90.44157
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -410,7 +415,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: 18.551315
+    Value: 17.505306
     Center: 28.05
     Range: {x: -10, y: 45}
     Wrap: 0
