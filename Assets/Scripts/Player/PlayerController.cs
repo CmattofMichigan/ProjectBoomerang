@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float groundAcceleration = 10f;
+    
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 10f;
@@ -16,7 +17,8 @@ public class PlayerController : MonoBehaviour
     public bool jumpRequested = false;
 
     [Header("Wall Kick")]
-    public bool isWallKickVelocityLocked = false;
+    public bool isVelocityLocked = false;
+    
 
     [Header("Gravity")]
     [SerializeField] private float gravity = -20f;
@@ -112,6 +114,7 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyHorizontalMovement()
     {
+        
         Vector2 input = Vector2.ClampMagnitude(moveInput, 1f);
 
         Vector3 cameraForward = cameraTransform.forward;
@@ -165,7 +168,7 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyAirAcceleration()
     {
-        if (isWallKickVelocityLocked)
+        if (isVelocityLocked)
         {
             return;
         }
