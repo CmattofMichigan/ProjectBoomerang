@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float groundAcceleration = 10f;
+    public bool isVelocityLocked = false;
     
 
     [Header("Jump")]
@@ -17,7 +18,12 @@ public class PlayerController : MonoBehaviour
     public bool jumpRequested = false;
 
     [Header("Wall Kick")]
-    public bool isVelocityLocked = false;
+    [SerializeField] private float kickAirAcceleration = 0.2f;
+    public Vector3 airKickDirection;
+    public bool isKickActive = false;
+    public bool isWallJumpActive = false;
+    
+    
     
 
     [Header("Gravity")]
@@ -172,26 +178,15 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
+        float currentAirAcceleration = isKickActive ? kickAirAcceleration : airAcceleration;
 
         Vector3 horizontalMovement = new Vector3(velocity.x, 0, velocity.z);
 
-        horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, airAcceleration * Time.deltaTime);
+        horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, currentAirAcceleration * Time.deltaTime);
         velocity.x = horizontalMovement.x;
         velocity.z = horizontalMovement.z;
     }
 
-    /*private bool CheckCollision(Vector3 direction, float distance, out RaycastHit hitInfo)
-    {
-    
-        Vector3 center = capsuleCollider.bounds.center;
-        float halfHeight = capsuleCollider.bounds.extents.y;
-        Vector3 point1 = center + Vector3.up * (halfHeight - capsuleCollider.radius);
-        Vector3 point2 = center + Vector3.down * (halfHeight - capsuleCollider.radius);
-
-        bool hit = Physics.CapsuleCast(point1, point2, capsuleCollider.radius, direction, out hitInfo, distance);
-        
-        return hit;
-    }*/
     
     // checks if the player is on the ground
     private bool CheckGround()
@@ -264,6 +259,7 @@ public class PlayerController : MonoBehaviour
         wasGrounded = isGrounded;
     }
 
+    
     private void OnCollisionEnter(Collision collision)
     {
         GameObject otherThing = collision.gameObject;

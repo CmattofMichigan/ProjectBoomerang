@@ -7,26 +7,27 @@ public class AirKick : MonoBehaviour
     [SerializeField] private float kickForce = 10f;
     [SerializeField] private float kickLift = 1f;
     [SerializeField] private float kickDistance = 2f;
-    [SerializeField] private float kickDuration = 0.5f;
     [SerializeField] private float kickDelayTimer = 0.15f;
     //[SerializeField] private float kickInputBufferTimer = 0.2f;
     private float kickDelayRemaining = 0f;
     //private bool kickInputBuffered = false;
-    private float airKickVelocityLockTimer = 0f;
-    [SerializeField] private float airKickVelocityLockTimerLength = 2f;
+    private float airKickLockTimer = 0f;
+    [SerializeField] private float airKickDuration = 2f;
 
     [Header("Wall Jump Settings")]
     [SerializeField] private float wallJumpForce = 10f;
     [SerializeField] private float wallJumpYForce = 5f;
     //[SerializeField] private float wallJumpControlBuffer = 0.2f;
-    private float wallKickVelocityLockTimer = 0f;
-    [SerializeField] private float wallKickVelocityTimerLength = 2f;
-    private bool wallKickIsActive = false;
+    private float wallKickLockTimer = 0f;
+    [SerializeField] private float wallKickDuration = 2f;
+    private float kickCounter = 0;
+    
 
 
-    private float kickActiveTimer = 0f;
-    private bool kickIsActive = false;
+    
+    
     private bool kickAvailable = false;
+    private bool kickUsed = false;
 
 
     private PlayerController playerController;
@@ -57,21 +58,20 @@ public class AirKick : MonoBehaviour
         KickReset();
         PerformAirKick();
         castKick();
-        KickTimer();
         AirKickControlLock();
         WallKickControlLock();
     }
 
     private void checkAirKickAvailability()
     {
-        if (!characterController.isGrounded && !kickAvailable && !kickIsActive)
+        if (!characterController.isGrounded && !kickAvailable)
         {
+
     
             kickDelayRemaining += Time.deltaTime;
 
-            if (kickDelayRemaining >= kickDelayTimer)
+            if (kickDelayRemaining >= kickDelayTimer && !kickUsed && kickCounter < 3)
             {
-                
                 kickAvailable = true;
                 kickDelayRemaining = 0f;
             }
@@ -84,33 +84,35 @@ public class AirKick : MonoBehaviour
         //if jump pressed while airborne
         if (playerController.jumpRequested && kickAvailable)
         {
-            kickIsActive = true;
-            kickAvailable = false;
-            playerController.isVelocityLocked = true;
-            playerRotation.isRotationLocked = true;
-            airKickVelocityLockTimer = airKickVelocityLockTimerLength;
+            playerRotation.airKickDirection = playerController.targetDirection;
+
+            playerController.isKickActive = true;
+            kickUsed = true;
+            airKickLockTimer = airKickDuration;
             
-            kickActiveTimer = 0f;
+            
             playerController.jumpRequested = false;
             Vector3 kickDirection = playerController.targetDirection * kickForce;
 
             kickDirection.y = kickLift;
 
-            //playerController.velocity.x += kickDirection.x;
-            //playerController.velocity.z += kickDirection.z;
+            playerController.velocity.x += kickDirection.x;
+            playerController.velocity.z += kickDirection.z;
             playerController.velocity.y = kickDirection.y;
+            kickAvailable = false;
+            kickCounter += 1;
         }
     }
 
     private void castKick()
     {
-        if (kickIsActive)
+        if (playerController.isKickActive && !characterController.isGrounded)
         {
             if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hitInfo, kickDistance))
             {
                 if (Mathf.Abs(hitInfo.normal.y) < 0.2f)
                 {
-                    kickIsActive = false;
+                    playerController.isKickActive = false;
                     TriggerWallKick(hitInfo);
                 }
             }
@@ -118,24 +120,12 @@ public class AirKick : MonoBehaviour
         
     }
 
-    private void KickTimer() 
-    {
-        if (kickIsActive)
-        {
-            kickActiveTimer += Time.deltaTime;
-            
-            if (kickActiveTimer >= kickDuration)
-            {
-                kickIsActive = false;
-            }
-
-        }
-        
-    }
+   
 
     private void TriggerWallKick(RaycastHit hitInfo)
     {
-        wallKickIsActive = true;
+        kickUsed = false;
+        playerController.isWallJumpActive = true;
         // Apply a force in the opposite direction of the wall normal
         Vector3 incomingVelocity = playerController.velocity;
         // incoming horizontal velocity
@@ -150,7 +140,6 @@ public class AirKick : MonoBehaviour
         if (incomingHorizontalVelocity.sqrMagnitude > 0.01f)
         {
             wallBounceDirection = Vector3.Reflect(incomingHorizontalVelocity.normalized, wallNormal).normalized;
-            
         }
         else
         {
@@ -164,49 +153,62 @@ public class AirKick : MonoBehaviour
         
         playerController.isVelocityLocked = true;
         playerRotation.isRotationLocked = true;
-        wallKickVelocityLockTimer = wallKickVelocityTimerLength;
+        wallKickLockTimer = wallKickDuration;
         
-        kickAvailable = true;
+        
 
     }
 
     private void KickReset()
     {
-        if (characterController.isGrounded || kickIsActive)
+        if (characterController.isGrounded)
         {
             kickAvailable = false;
+            playerController.isKickActive = false;
+            playerController.isWallJumpActive = false;
+            playerController.isVelocityLocked = false;
+            playerRotation.isRotationLocked = false;
+            kickUsed = false;
+            airKickLockTimer = airKickDuration;
+            wallKickLockTimer = wallKickDuration;
+            kickCounter = 0;
+
         }
     }
 
     private void WallKickControlLock()
     {
-
-        if (wallKickVelocityLockTimer > 0f && wallKickIsActive)
+        if (playerController.isWallJumpActive)
         {
-            wallKickVelocityLockTimer -= Time.deltaTime;
-        }
-        else
-        {
-            playerController.isVelocityLocked = false;
-            playerRotation.isRotationLocked = false;
-            wallKickIsActive = false;
-
-        }
-    }
-
-    private void AirKickControlLock()
-    {
-        
-        {
-            if (airKickVelocityLockTimer > 0f && kickIsActive)
+            if (wallKickLockTimer > 0f)
             {
-                airKickVelocityLockTimer -= Time.deltaTime;
+                wallKickLockTimer -= Time.deltaTime;
             }
             else
             {
                 playerController.isVelocityLocked = false;
                 playerRotation.isRotationLocked = false;
-                kickIsActive = false;
+                playerController.isWallJumpActive = false;
+
+            }
+
+        }
+
+    }
+
+    private void AirKickControlLock()
+    {
+        if (playerController.isKickActive)
+        {
+            if (airKickLockTimer > 0f)
+            {
+                airKickLockTimer -= Time.deltaTime;
+            }
+            else
+            {
+                //playerController.isVelocityLocked = false;
+                //playerRotation.isRotationLocked = false;
+                playerController.isKickActive = false;
             }
         }
     }
