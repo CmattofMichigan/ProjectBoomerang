@@ -14,4 +14,13 @@ public class EnemyDummy : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    public void OnCollisionEnter(Collision collision)
+    {
+        GameObject otherThing = collision.gameObject;
+        if (otherThing.CompareTag("Boomerang"))
+        {
+            TakeDamage(1);
+        }
+    }
 }
