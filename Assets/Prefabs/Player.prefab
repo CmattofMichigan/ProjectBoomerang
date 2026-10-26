@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 9070373041747561653}
   - component: {fileID: 4160243043646671132}
   - component: {fileID: 7333623701501295311}
+  - component: {fileID: 1261465421062543839}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -104,19 +105,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 10
-  groundAcceleration: 40
+  groundAcceleration: 30
+  isVelocityLocked: 0
   jumpForce: 15
   jumpCutGravityMultiplier: 1.2
   jumpApexThreshold: 0.1
-  gravity: -30
+  isJumping: 0
+  jumpRequested: 0
+  kickAirAcceleration: 10
+  airKickDirection: {x: 0, y: 0, z: 0}
+  isKickActive: 0
+  isWallJumpActive: 0
+  gravity: -25
   maxFallSpeed: -80
-  airAcceleration: 20
+  airAcceleration: 12
   apexGravityMultiplier: 0.15
   cameraTransform: {fileID: 9109091393968607381}
   jump: {fileID: 8300000, guid: 64c318239dc05dc44a2b4c3c8415cc62, type: 3}
   land: {fileID: 8300000, guid: a7fffb479aa554c4897f64205c1a6a7a, type: 3}
   Boomerang: {fileID: -5466233882258318452, guid: 0a84f01990d8403039ffe8e55ef6800c, type: 3}
-  pickupCooldown: 1
+  velocity: {x: 0, y: 0, z: 0}
 --- !u!143 &4160243043646671132
 CharacterController:
   m_ObjectHideFlags: 0
@@ -154,7 +162,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6468c64be15ded4e9664a979a2f98b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRotationLocked: 0
   rotationSpeed: 10
+  airKickRoation: 2
+  airKickDirection: {x: 0, y: 0, z: 0}
+--- !u!114 &1261465421062543839
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1222990303323863618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3da951fd0f2f166439e7d10bb632a185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  kickForce: 3
+  kickLift: 4
+  kickDistance: 2
+  kickDelayTimer: 0.4
+  airKickDuration: 1
+  wallJumpForce: 7
+  wallJumpYForce: 13
+  wallKickDuration: 0.6
 --- !u!1 &7206329406951060127
 GameObject:
   m_ObjectHideFlags: 0
@@ -296,8 +327,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7871565339347727909}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.10487655, y: 0.88763374, z: -0.3722443, w: 0.25008294}
-  m_LocalPosition: {x: -1.8273025, y: 3.56231, z: 2.985462}
+  m_LocalRotation: {x: 0.005463689, y: 0.96172297, z: -0.019226776, w: 0.27329364}
+  m_LocalPosition: {x: -1.314689, y: 0.100000024, z: 2.1264038}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -380,7 +411,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: 148.53058
+    Value: 148.2728
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -390,7 +421,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: 28.05
+    Value: -10
     Center: 28.05
     Range: {x: -10, y: 45}
     Wrap: 0
