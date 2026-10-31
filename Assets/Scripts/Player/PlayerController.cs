@@ -6,15 +6,25 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float groundAcceleration = 10f;
+    public bool isVelocityLocked = false;
+    
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 10f;
     [SerializeField] private float jumpCutGravityMultiplier = 0.5f;
     [SerializeField] private float jumpApexThreshold = 1.5f;
     bool isJumpPressed = false;
-    bool isJumping = false;
-    bool jumpRequested = false;
+    public bool isJumping = false;
+    public bool jumpRequested = false;
 
+    [Header("Wall Kick")]
+    [SerializeField] private float kickAirAcceleration = 0.2f;
+    public Vector3 airKickDirection;
+    public bool isKickActive = false;
+    public bool isWallJumpActive = false;
+    
+    
+    
 
     [Header("Gravity")]
     [SerializeField] private float gravity = -20f;
@@ -40,7 +50,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public Rigidbody Boomerang;
     private bool isThrown = false;
 
-    private Vector3 velocity;
+    public Vector3 velocity;
     public Vector3 targetDirection { get; set; }
 
 
@@ -87,19 +97,22 @@ public class PlayerController : MonoBehaviour
         ApplyHorizontalMovement();
         Jump();
         //if on ground
+
         if (CheckGround())
         {
             // apply jump when on the ground
             ApplyGroundAcceleration();
-            
+
         }
         // else in air
         else
         {
-            
+
             ApplyAirAcceleration();
         }
-        
+
+
+
         characterController.Move(velocity * Time.deltaTime);
 
         CheckLanding();
@@ -107,6 +120,7 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyHorizontalMovement()
     {
+        
         Vector2 input = Vector2.ClampMagnitude(moveInput, 1f);
 
         Vector3 cameraForward = cameraTransform.forward;
@@ -160,25 +174,19 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyAirAcceleration()
     {
+        if (isVelocityLocked)
+        {
+            return;
+        }
+        float currentAirAcceleration = isKickActive ? kickAirAcceleration : airAcceleration;
+
         Vector3 horizontalMovement = new Vector3(velocity.x, 0, velocity.z);
 
-        horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, airAcceleration * Time.deltaTime);
+        horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, currentAirAcceleration * Time.deltaTime);
         velocity.x = horizontalMovement.x;
         velocity.z = horizontalMovement.z;
     }
 
-    /*private bool CheckCollision(Vector3 direction, float distance, out RaycastHit hitInfo)
-    {
-    
-        Vector3 center = capsuleCollider.bounds.center;
-        float halfHeight = capsuleCollider.bounds.extents.y;
-        Vector3 point1 = center + Vector3.up * (halfHeight - capsuleCollider.radius);
-        Vector3 point2 = center + Vector3.down * (halfHeight - capsuleCollider.radius);
-
-        bool hit = Physics.CapsuleCast(point1, point2, capsuleCollider.radius, direction, out hitInfo, distance);
-        
-        return hit;
-    }*/
     
     // checks if the player is on the ground
     private bool CheckGround()
@@ -233,7 +241,6 @@ public class PlayerController : MonoBehaviour
             if (velocity.y > 0)
             {
                 velocity.y /= jumpCutGravityMultiplier;
-                Debug.Log("Jump cut");
             }
         }
 
@@ -252,6 +259,7 @@ public class PlayerController : MonoBehaviour
         wasGrounded = isGrounded;
     }
 
+    
     private void OnCollisionEnter(Collision collision)
     {
         GameObject otherThing = collision.gameObject;
