@@ -22,6 +22,12 @@ public class PlayerHealth : MonoBehaviour
         healthBar.minValue = 0;
         healthBar.maxValue = maxHealth;
         healthBar.value = currentHealth;
+
+        // Show the green fill when health is above zero.
+        if (healthBar.fillRect != null)
+        {
+            healthBar.fillRect.gameObject.SetActive(currentHealth > 0);
+        }
     }
 
     public void TakeDamage(int damage)
@@ -32,7 +38,15 @@ public class PlayerHealth : MonoBehaviour
         currentHealth = Mathf.Max(0, currentHealth - damage);
 
         if (healthBar != null)
+        {
             healthBar.value = currentHealth;
+
+            // Completely hide the green fill when health reaches zero.
+            if (healthBar.fillRect != null)
+            {
+                healthBar.fillRect.gameObject.SetActive(currentHealth > 0);
+            }
+        }
 
         Debug.Log("Player Health: " + currentHealth);
 
