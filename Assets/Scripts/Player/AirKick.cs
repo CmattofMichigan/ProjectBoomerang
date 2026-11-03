@@ -33,6 +33,7 @@ public class AirKick : MonoBehaviour
     private PlayerController playerController;
     private CharacterController characterController;
     private PlayerRotation playerRotation;
+    private AbilityManager abilityManager;
 
     
 
@@ -42,7 +43,7 @@ public class AirKick : MonoBehaviour
         playerController = GetComponent<PlayerController>();
         characterController = GetComponent<CharacterController>();
         playerRotation = GetComponent<PlayerRotation>();
-
+        abilityManager = GetComponent<AbilityManager>();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -54,12 +55,16 @@ public class AirKick : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        checkAirKickAvailability();
-        KickReset();
-        PerformAirKick();
-        castKick();
-        AirKickControlLock();
-        WallKickControlLock();
+        if (abilityManager.HasAbility(AbilityType.AirKick))
+        {
+            checkAirKickAvailability();
+            KickReset();
+            PerformAirKick();
+            castKick();
+            AirKickControlLock();
+            WallKickControlLock();
+        }
+
     }
 
     private void checkAirKickAvailability()

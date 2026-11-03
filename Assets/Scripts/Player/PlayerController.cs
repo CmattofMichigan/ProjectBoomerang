@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Components")]
     private CharacterController characterController;
+    private AbilityManager abilityManager;
     [SerializeField] private Transform cameraTransform;
 
     [Header("Player Input")]
@@ -58,6 +59,7 @@ public class PlayerController : MonoBehaviour
     {
         inputActions = new PlayerInput();
         characterController = GetComponent<CharacterController>();
+        abilityManager = GetComponent<AbilityManager>();
 
         inputActions.Player.Jump.started += onJump;
         inputActions.Player.Jump.canceled += onJump;
@@ -156,7 +158,8 @@ public class PlayerController : MonoBehaviour
 
     void OnBoomerangThrow(InputAction.CallbackContext context)
     {
-        if (context.ReadValueAsButton() && !isThrown)
+        
+        if (context.ReadValueAsButton() && !isThrown && abilityManager.HasAbility(AbilityType.Boomerang))
         {
             Rigidbody boom = Instantiate(Boomerang, transform.position + transform.forward, transform.rotation) as Rigidbody;
             isThrown = true;
