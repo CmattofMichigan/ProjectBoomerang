@@ -105,22 +105,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec8e36aebe774c740ad4426b83d44fdb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 10
+  moveSpeed: 8
   groundAcceleration: 30
+  groundDeceleration: 60
   isVelocityLocked: 0
-  jumpForce: 15
-  jumpCutGravityMultiplier: 1.2
-  jumpApexThreshold: 0.1
+  jumpForce: 16
+  jumpCutMultiplier: 0.5
+  jumpApexThreshold: 0.3
   isJumping: 0
   jumpRequested: 0
-  kickAirAcceleration: 10
+  jumpBufferTime: 0.2
+  coyoteTime: 0.2
+  kickAirAcceleration: 30
   airKickDirection: {x: 0, y: 0, z: 0}
   isKickActive: 0
   isWallJumpActive: 0
-  gravity: -25
-  maxFallSpeed: -80
-  airAcceleration: 12
-  apexGravityMultiplier: 0.15
+  gravity: -32
+  maxFallSpeed: -40
+  airAcceleration: 25
+  airDeceleration: 8
+  apexGravityMultiplier: 0.5
   cameraTransform: {fileID: 9109091393968607381}
   jump: {fileID: 8300000, guid: 64c318239dc05dc44a2b4c3c8415cc62, type: 3}
   land: {fileID: 8300000, guid: a7fffb479aa554c4897f64205c1a6a7a, type: 3}
@@ -340,8 +344,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7871565339347727909}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.10571367, y: 0.88706887, z: -0.3720075, w: 0.2520791}
-  m_LocalPosition: {x: -1.8407162, y: 3.56231, z: 2.9772105}
+  m_LocalRotation: {x: 0.27390066, y: 0.41281918, z: -0.1316908, w: 0.8586131}
+  m_LocalPosition: {x: -3.0337377, y: 2.758908, z: -2.4255936}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -424,7 +428,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: 148.2728
+    Value: 51.356247
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -434,7 +438,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: 28.05
+    Value: 21.672808
     Center: 28.05
     Range: {x: -10, y: 45}
     Wrap: 0

@@ -6,16 +6,22 @@ public class PlayerController : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float groundAcceleration = 10f;
+    [SerializeField] private float groundDeceleration = 10f;
     public bool isVelocityLocked = false;
     
 
     [Header("Jump")]
     [SerializeField] private float jumpForce = 10f;
-    [SerializeField] private float jumpCutGravityMultiplier = 0.5f;
+    [SerializeField] private float jumpCutMultiplier = 0.5f;
     [SerializeField] private float jumpApexThreshold = 1.5f;
     bool isJumpPressed = false;
     public bool isJumping = false;
     public bool jumpRequested = false;
+    private bool jumpWasCut = false;
+    [SerializeField] private float jumpBufferTime = 0.2f;
+    private float jumpBufferCounter = 0f;
+    [SerializeField] private float coyoteTime = 0.1f;
+    private float coyoteTimeCounter = 0f;
 
     [Header("Wall Kick")]
     [SerializeField] private float kickAirAcceleration = 0.2f;
@@ -30,6 +36,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = -20f;
     [SerializeField] private float maxFallSpeed = -60f;
     [SerializeField] private float airAcceleration = 5f;
+    [SerializeField] private float airDeceleration = 5f;
     [SerializeField] private float apexGravityMultiplier = 0.3f;
     private bool wasGrounded;
     
@@ -98,19 +105,24 @@ public class PlayerController : MonoBehaviour
         ApplyGravity();
         ApplyHorizontalMovement();
         Jump();
+        ApplyAcceleration();
+        
         //if on ground
 
         if (CheckGround())
         {
-            // apply jump when on the ground
-            ApplyGroundAcceleration();
+            //reset coyote time counter when on ground
+            if (velocity.y <= 0)
+            {
+                coyoteTimeCounter = coyoteTime;
+            }
+            
 
         }
         // else in air
         else
         {
-
-            ApplyAirAcceleration();
+            coyoteTimeCounter -= Time.deltaTime;
         }
 
 
@@ -153,6 +165,7 @@ public class PlayerController : MonoBehaviour
         if (context.started)
         {
             jumpRequested = true;
+            jumpBufferCounter = jumpBufferTime;
         }
     }
 
@@ -166,26 +179,35 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void ApplyGroundAcceleration()
+    private void ApplyAcceleration()
     {
-        Vector3 horizontalMovement = new Vector3(velocity.x, 0, velocity.z);
-
-        horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, groundAcceleration * Time.deltaTime);
-        velocity.x = horizontalMovement.x;
-        velocity.z = horizontalMovement.z;
-    }
-
-    private void ApplyAirAcceleration()
-    {
+        // If velocity is locked, do not apply acceleration
         if (isVelocityLocked)
         {
             return;
         }
-        float currentAirAcceleration = isKickActive ? kickAirAcceleration : airAcceleration;
+
+        // If input is too small, set deceleration flag
+        bool isDeceleration = false;
+        if (targetDirection.sqrMagnitude < 0.001f)
+        {
+            isDeceleration = true;
+        }
+
+        float currentAcceleration;
+        if (CheckGround())
+        {
+            currentAcceleration = isDeceleration ?  groundDeceleration : groundAcceleration;
+        }
+        else
+        {
+            currentAcceleration = isDeceleration ? airDeceleration : isKickActive ? kickAirAcceleration : airAcceleration;
+        }
 
         Vector3 horizontalMovement = new Vector3(velocity.x, 0, velocity.z);
+        
 
-        horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, currentAirAcceleration * Time.deltaTime);
+        horizontalMovement = Vector3.MoveTowards(horizontalMovement, targetDirection * moveSpeed, currentAcceleration * Time.deltaTime);
         velocity.x = horizontalMovement.x;
         velocity.z = horizontalMovement.z;
     }
@@ -207,28 +229,36 @@ public class PlayerController : MonoBehaviour
 
         else
         {
-            velocity.y += gravity * Time.deltaTime;
+            float calculatedGravity = gravity;
+           
             //if near apex of jump reduce gravity for short hangtime
             if (Mathf.Abs(velocity.y) < jumpApexThreshold)
             {
-                velocity.y *= apexGravityMultiplier;
+                calculatedGravity *= apexGravityMultiplier;
             }
             if (velocity.y < maxFallSpeed)
             {
                 velocity.y = maxFallSpeed;
             }
+
+            
+            velocity.y += calculatedGravity * Time.deltaTime;
         }
 
     }
 
     private void Jump()
     {
+        jumpBufferCounter -= Time.deltaTime;
 
-        if (jumpRequested && CheckGround())
+        if (jumpRequested && (CheckGround() || coyoteTimeCounter > 0f) && jumpBufferCounter >= 0f)
         {
+            coyoteTimeCounter = 0f;
+        
             jumpRequested = false;
             velocity.y = jumpForce;
             isJumping = true;
+            jumpWasCut = false;
             //play jump sound
             SFXManager.instance.PlaySFXClip(jump, transform, 1f);
         }
@@ -238,15 +268,16 @@ public class PlayerController : MonoBehaviour
             isJumping = false;
         }
 
-
+        // if the player releases the jump button while jumping, cut the jump short
         if (!isJumpPressed && isJumping && velocity.y > 0)
         {
-            if (velocity.y > 0)
+            if (!jumpWasCut)
             {
-                velocity.y /= jumpCutGravityMultiplier;
+                jumpWasCut = true;
+                velocity.y *= jumpCutMultiplier;
+
             }
         }
-
     }
 
     private void CheckLanding()
