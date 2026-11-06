@@ -1,17 +1,22 @@
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private int maxHealth = 100;
     [SerializeField] private Slider healthBar;
+    [SerializeField] private GameObject gameOverPanel;
 
     private int currentHealth;
 
     private void Start()
     {
         currentHealth = maxHealth;
+
+        if (gameOverPanel != null)
+            gameOverPanel.SetActive(false);
 
         if (healthBar == null)
         {
@@ -23,7 +28,6 @@ public class PlayerHealth : MonoBehaviour
         healthBar.maxValue = maxHealth;
         healthBar.value = currentHealth;
 
-        // Show the green fill when health is above zero.
         if (healthBar.fillRect != null)
         {
             healthBar.fillRect.gameObject.SetActive(currentHealth > 0);
@@ -41,7 +45,6 @@ public class PlayerHealth : MonoBehaviour
         {
             healthBar.value = currentHealth;
 
-            // Completely hide the green fill when health reaches zero.
             if (healthBar.fillRect != null)
             {
                 healthBar.fillRect.gameObject.SetActive(currentHealth > 0);
@@ -51,7 +54,26 @@ public class PlayerHealth : MonoBehaviour
         Debug.Log("Player Health: " + currentHealth);
 
         if (currentHealth == 0)
+        {
             Debug.Log("Player died!");
+
+            if (gameOverPanel != null)
+                gameOverPanel.SetActive(true);
+            else
+                Debug.LogError("GameOverPanel is not assigned!");
+        }
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void ReturnToMainMenu()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Main Menu");
     }
 
     [ContextMenu("Test - Take 10 Damage")]
