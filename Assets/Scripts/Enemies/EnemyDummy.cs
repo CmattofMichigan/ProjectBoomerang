@@ -3,6 +3,7 @@ using UnityEngine;
 public class EnemyDummy : MonoBehaviour
 {
     [SerializeField] private int health = 3;
+    [SerializeField] private GameObject abilityPickupPrefab;
 
     public void TakeDamage(int damage)
     {
@@ -11,6 +12,11 @@ public class EnemyDummy : MonoBehaviour
 
         if (health <= 0)
         {
+            if (abilityPickupPrefab != null)
+            {
+                Instantiate(abilityPickupPrefab, transform.position + Vector3.down * 1.5f, Quaternion.identity);
+            }
+
             Destroy(gameObject);
         }
     }
