@@ -22,7 +22,7 @@ public class AirKick : MonoBehaviour
     [SerializeField] private float wallKickDuration = 2f;
     private float kickCounter = 0;
     
-
+    private bool off = false;
 
     
     
@@ -55,7 +55,7 @@ public class AirKick : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (abilityManager.HasAbility(AbilityType.AirKick))
+        if (abilityManager.HasAbility(AbilityType.AirKick ) && off)
         {
             checkAirKickAvailability();
             KickReset();
@@ -217,9 +217,5 @@ public class AirKick : MonoBehaviour
             }
         }
     }
-
-
-
-
 
 }
