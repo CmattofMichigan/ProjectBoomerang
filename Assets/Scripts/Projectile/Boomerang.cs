@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class Boomerang : MonoBehaviour
 {
-    [SerializeField] private float throwSpeed = 15f;
-    [SerializeField] private float rotSpeed = 45f;
+    [SerializeField] private float throwSpeed = 20f;
+    [SerializeField] private float rotSpeed = 360f;
+    [SerializeField] private float returnDelay = 0.5f;
+    [SerializeField] private float failsafeTimer = 10f;
     private float startTime;
     private Rigidbody rb;
     public bool finishForward = false;
@@ -40,7 +42,7 @@ public class Boomerang : MonoBehaviour
         rb.MovePosition(destination);
         visual.transform.Rotate(Vector3.up * rotSpeed * Time.deltaTime);
 
-        if (Time.time >= startTime + 1.0f)
+        if (Time.time >= startTime + returnDelay)
         {
             finishForward = true;
         }

@@ -95,8 +95,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 889b8ee080534f11c9c45236581b4e49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  throwSpeed: 10
+  throwSpeed: 20
   rotSpeed: 360
+  returnDelay: 1
+  failsafeTimer: 10
   finishForward: 0
   Player: {fileID: 0}
 --- !u!1 &7097117518092670519
