@@ -7,6 +7,8 @@ public partial class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float groundAcceleration = 10f;
     [SerializeField] private float groundDeceleration = 10f;
+    public bool isVelocityLocked = false;
+    public MovingPlatform currentPlatform;
     
     
 
@@ -352,6 +354,16 @@ public partial class PlayerController : MonoBehaviour
     }
 
 
+        Vector3 platformMovement = Vector3.zero;
+
+        if (currentPlatform != null && velocity.y <= 0f)
+        {
+            platformMovement = currentPlatform.GetMovement();
+        }
+
+        characterController.Move(velocity * Time.deltaTime + platformMovement);
+
+        CheckLanding();
     // takes movement input and applies it to the player's velocity
     private void UpdateVelocity()
     {
