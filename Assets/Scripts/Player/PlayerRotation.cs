@@ -45,7 +45,7 @@ public class PlayerRotation : MonoBehaviour
     private void RotatePlayer(Vector3 targetDirection)
     {
         
-
+        // If target direction is too small, don't rotate
         if (targetDirection.sqrMagnitude < 0.001f)
         {
 
@@ -54,7 +54,7 @@ public class PlayerRotation : MonoBehaviour
         }
 
         float currentRotationSpeed = playerController.isKickActive ? airKickRoation : rotationSpeed;
-        Debug.Log(currentRotationSpeed);
+        
 
         targetRotation = Quaternion.LookRotation(targetDirection);
 
