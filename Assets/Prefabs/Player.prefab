@@ -120,6 +120,14 @@ MonoBehaviour:
   airKickDirection: {x: 0, y: 0, z: 0}
   isKickActive: 0
   isWallJumpActive: 0
+  kickDelayTime: 0.2
+  kickForce: 3
+  kickLift: 4
+  kickDistance: 2
+  airKickDuration: 1
+  wallJumpForce: 7
+  wallJumpYForce: 13
+  wallJumpDuration: 0.6
   gravity: -32
   maxFallSpeed: -40
   airAcceleration: 25
@@ -130,6 +138,7 @@ MonoBehaviour:
   land: {fileID: 8300000, guid: a7fffb479aa554c4897f64205c1a6a7a, type: 3}
   Boomerang: {fileID: -5466233882258318452, guid: 0a84f01990d8403039ffe8e55ef6800c, type: 3}
   velocity: {x: 0, y: 0, z: 0}
+  currentState: 0
 --- !u!143 &4160243043646671132
 CharacterController:
   m_ObjectHideFlags: 0
@@ -344,8 +353,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7871565339347727909}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.27390066, y: 0.41281918, z: -0.1316908, w: 0.8586131}
-  m_LocalPosition: {x: -3.0337377, y: 2.758908, z: -2.4255936}
+  m_LocalRotation: {x: 0.36441594, y: -0.5621722, z: 0.30208677, w: 0.6781645}
+  m_LocalPosition: {x: 2.8390026, y: 4.365493, z: -0.5356734}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -428,7 +437,7 @@ MonoBehaviour:
     SplineCurvature: 0.5
   RecenteringTarget: 2
   HorizontalAxis:
-    Value: 51.356247
+    Value: -79.31461
     Center: 0
     Range: {x: -180, y: 180}
     Wrap: 1
@@ -438,7 +447,7 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: 21.672808
+    Value: 35.19112
     Center: 28.05
     Range: {x: -10, y: 45}
     Wrap: 0
