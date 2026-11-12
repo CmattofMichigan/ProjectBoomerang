@@ -9,7 +9,8 @@ public class Boomerang : MonoBehaviour
     private float startTime;
     private Rigidbody rb;
     public bool finishForward = false;
-    [SerializeField] private Transform Player;
+    [SerializeField] private GameObject Player;
+    private Transform PlayerTranform;
     private Transform visual;
     private Vector3 destination;
     private Vector3 initial;
@@ -19,9 +20,12 @@ public class Boomerang : MonoBehaviour
     {
         startTime = Time.time;
         rb = GetComponent<Rigidbody>();
-        Player = GameObject.FindGameObjectWithTag("Player").transform;
+        Player = GameObject.FindGameObjectWithTag("Player");
+        PlayerTranform = Player.transform;
         visual = transform.Find("BoomerangVisual");
         initial = rb.position;
+        //Debug.Log("start completed");
+        //Debug.Log($"Object name: {Player.name}");
     }
 
     // Update is called once per frame
@@ -34,7 +38,7 @@ public class Boomerang : MonoBehaviour
         }
         else
         {
-            destination = Player.transform.position;
+            destination = PlayerTranform.position;
             destination.y -= 0.5f;
             destination = Vector3.MoveTowards(rb.position, destination, throwSpeed * Time.deltaTime);
         }
@@ -45,6 +49,13 @@ public class Boomerang : MonoBehaviour
         if (Time.time >= startTime + returnDelay)
         {
             finishForward = true;
+        }
+
+        if (Time.time >= startTime + failsafeTimer)
+        {
+            Player.GetComponent<PlayerController>().ReturnBoomerang();
+            //Debug.Log("Boomerang failsafe triggered");
+            Destroy(gameObject);
         }
     }
 

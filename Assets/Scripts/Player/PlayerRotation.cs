@@ -54,7 +54,7 @@ public class PlayerRotation : MonoBehaviour
         }
 
         float currentRotationSpeed = playerController.isKickActive ? airKickRoation : rotationSpeed;
-        Debug.Log(currentRotationSpeed);
+        //Debug.Log(currentRotationSpeed);
 
         targetRotation = Quaternion.LookRotation(targetDirection);
 

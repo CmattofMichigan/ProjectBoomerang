@@ -179,6 +179,12 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void ReturnBoomerang()
+    {
+        isThrown = false;
+        //Debug.Log("Boomerang returned");
+    }
+
     private void ApplyAcceleration()
     {
         // If velocity is locked, do not apply acceleration
