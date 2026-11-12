@@ -352,7 +352,7 @@ public partial class PlayerController : MonoBehaviour
         }
 
     }
-
+/*
 
         Vector3 platformMovement = Vector3.zero;
 
@@ -364,6 +364,8 @@ public partial class PlayerController : MonoBehaviour
         characterController.Move(velocity * Time.deltaTime + platformMovement);
 
         CheckLanding();
+
+        */
     // takes movement input and applies it to the player's velocity
     private void UpdateVelocity()
     {
