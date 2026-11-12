@@ -7,7 +7,7 @@ public partial class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float groundAcceleration = 10f;
     [SerializeField] private float groundDeceleration = 10f;
-    public bool isVelocityLocked = false;
+    
     
 
 
@@ -42,8 +42,6 @@ public partial class PlayerController : MonoBehaviour
     private Vector3 wallNormal;
     [SerializeField] private float wallJumpForce = 10f;
     [SerializeField] private float wallJumpYForce = 5f;
-    //[SerializeField] private float wallJumpControlBuffer = 0.2f;
-    private float wallJumpLockTimer = 0f;
     [SerializeField] private float wallJumpDuration = 2f;
     
     
@@ -59,6 +57,7 @@ public partial class PlayerController : MonoBehaviour
     [Header("Components")]
     private CharacterController characterController;
     private AbilityManager abilityManager;
+    private PlayerRotation playerRotation;
     [SerializeField] private Transform cameraTransform;
 
     [Header("Player Input")]
@@ -88,6 +87,7 @@ public partial class PlayerController : MonoBehaviour
         inputActions = new PlayerInput();
         characterController = GetComponent<CharacterController>();
         abilityManager = GetComponent<AbilityManager>();
+        playerRotation = GetComponent<PlayerRotation>();
 
         inputActions.Player.Jump.started += onJump;
         inputActions.Player.Jump.canceled += onJump;
@@ -122,6 +122,10 @@ public partial class PlayerController : MonoBehaviour
 
         //run timers
         jumpBufferCounter -= Time.deltaTime;
+        if (jumpBufferCounter < 0)
+        {
+            jumpRequested = false;
+        }
 
 
         switch (currentState)
@@ -245,7 +249,7 @@ public partial class PlayerController : MonoBehaviour
             return;
         }
 
-        if (jumpRequested && kickDelayRemaining >= kickDelayTime && kickCounter < 3)
+        if (jumpRequested && CanAirKick())
         {
             PerformAirKick();
             ChangeState(PlayerState.Airkick);
@@ -268,7 +272,7 @@ public partial class PlayerController : MonoBehaviour
         }
 
         //switch State Airkick
-        if (jumpRequested && kickDelayRemaining >= kickDelayTime && kickCounter < 3)
+        if (jumpRequested && CanAirKick())
         {
             PerformAirKick();
             ChangeState(PlayerState.Airkick);
@@ -285,7 +289,7 @@ public partial class PlayerController : MonoBehaviour
 
     private void UpdateAirKick()
     {
-        AirMovement();
+        AirKickMovement();
         kickDelayRemaining = 0f;
         airKickLockTimer -= Time.deltaTime;
 
@@ -293,7 +297,6 @@ public partial class PlayerController : MonoBehaviour
         {
             if (Mathf.Abs(hitInfo.normal.y) < 0.2f)
             {
-                wallJumpLockTimer = wallJumpDuration;
                 wallNormal = new Vector3(hitInfo.normal.x, 0, hitInfo.normal.z).normalized;
                 PerformWallJump();
                 ChangeState(PlayerState.WallJump);
@@ -301,8 +304,40 @@ public partial class PlayerController : MonoBehaviour
             }
         }
 
+        if (CheckGround())
+            {
+                ChangeState(PlayerState.Idle);
+                return;
+            }
+
         if (airKickLockTimer < 0)
         {
+            jumpRequested = false;
+            ChangeState(PlayerState.Fall);
+        }
+
+    }
+
+    private void UpdateWallJump()
+    {
+        ApplyGravity();
+        kickDelayRemaining += Time.deltaTime;
+
+        if (jumpRequested && CanAirKick())
+        {
+
+            PerformAirKick();
+            playerRotation.isRotationLocked = false;
+            ChangeState(PlayerState.Airkick);
+
+            return;
+        }
+
+        if (velocity.y < 0)
+        {
+            
+            playerRotation.isRotationLocked = false;
+            
             if (CheckGround())
             {
                 ChangeState(PlayerState.Idle);
@@ -311,21 +346,7 @@ public partial class PlayerController : MonoBehaviour
             {
                 ChangeState(PlayerState.Fall);
             }
-        }
-    }
-
-    private void UpdateWallJump()
-    {
-        ApplyGravity();
-        wallJumpLockTimer -= Time.deltaTime;
-
-        if (wallJumpLockTimer < 0)
-        {
-            isVelocityLocked = false;
-            //playerRotation.isRotationLocked = false;
             
-            //unlock velocity and transitions to states
-            ChangeState(PlayerState.Idle);
         }
 
     }
@@ -409,10 +430,7 @@ public partial class PlayerController : MonoBehaviour
     private void ApplyAcceleration(float acceleration, float deceleration)
     {
         // If velocity is locked, do not apply acceleration
-        if (isVelocityLocked)
-        {
-            return;
-        }
+       
 
         // If input is too small, set deceleration flag
         bool isDeceleration = targetDirection.sqrMagnitude < 0.001f;
@@ -469,6 +487,11 @@ public partial class PlayerController : MonoBehaviour
     }
 
     #region Air Kick
+
+    private bool CanAirKick()
+    {
+        return kickDelayRemaining >= kickDelayTime && kickCounter < 3 && abilityManager.HasAbility(AbilityType.AirKick);
+    }
     
 
      private void PerformAirKick()
@@ -491,8 +514,8 @@ public partial class PlayerController : MonoBehaviour
     {
         if (CheckGround())
         {
-            isVelocityLocked = false;
-            //playerRotation.isRotationLocked = false;
+            
+            playerRotation.isRotationLocked = false;
             kickCounter = 0;
 
         }
@@ -525,8 +548,8 @@ public partial class PlayerController : MonoBehaviour
 
         transform.rotation = Quaternion.LookRotation(wallBounceDirection);
         
-        isVelocityLocked = true;
-        //isRotationLocked = true;
+        
+        playerRotation.isRotationLocked = true;
         
     }
 
